@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\StoreLevel;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -32,7 +33,9 @@ class Store extends Model
      */
     protected function casts(): array
     {
-        return [];
+        return [
+            'level' => StoreLevel::class,
+        ];
     }
 
     /**
@@ -52,5 +55,10 @@ class Store extends Model
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
     }
 }
