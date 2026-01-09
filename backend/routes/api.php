@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\StoreController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -13,4 +14,5 @@ Route::middleware('auth:api')->group(function () {
 
 Route::middleware(['auth:api', 'role:super_admin'])->group(function () {
     Route::apiResource('stores', StoreController::class);
+    Route::apiResource('users', UserController::class);
 });
