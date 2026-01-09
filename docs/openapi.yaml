@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Store Management API
-  description: JWT authentication, Store, User, and Cashier management API built with Laravel 11.
+  description: JWT authentication, Store, User, Cashier, and Product management API built with Laravel 11.
   version: 1.0.0
 
 servers:
@@ -18,6 +18,8 @@ tags:
     description: User management endpoints
   - name: Cashier
     description: Cashier management endpoints
+  - name: Product
+    description: Product management endpoints (admin only)
 
 components:
   securitySchemes:
@@ -140,6 +142,40 @@ components:
           items:
             $ref: '#/components/schemas/User'
 
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 01keg1234567890abcdef1234
+        store_id:
+          type: string
+          example: 01keg02s5m0p2vx8baj8c4bsn6
+        name:
+          type: string
+          example: Mineral Water 600ml
+        sku:
+          type: string
+          nullable: true
+          example: MIN-600
+        price:
+          type: number
+          format: float
+          example: 5000
+        description:
+          type: string
+          nullable: true
+          example: Bottled mineral water 600ml
+        is_active:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
     StoreListResponse:
       type: object
       properties:
@@ -177,6 +213,27 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/User'
+
+    ProductListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            current_page:
+              type: integer
+            last_page:
+              type: integer
+            per_page:
+              type: integer
+            total:
+              type: integer
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Product'
 
     MessageResponse:
       type: object
@@ -798,3 +855,223 @@ paths:
           description: Unauthenticated
         '403':
           description: Forbidden (not own store or not cashier)
+
+  # Product endpoints
+  /products:
+    get:
+      tags:
+        - Product
+      summary: List products in the authenticated admin's store
+      description: Paginated list of products belonging to the admin's store, with optional search by name or SKU.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+            description: Search by product name or SKU
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: List of products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Forbidden (not admin or no store assigned)
+
+    post:
+      tags:
+        - Product
+      summary: Create a new product
+      description: Create a product in the authenticated admin's store.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - price
+              properties:
+                name:
+                  type: string
+                  example: Mineral Water 600ml
+                sku:
+                  type: string
+                  nullable: true
+                  example: MIN-600
+                price:
+                  type: number
+                  format: float
+                  minimum: 0
+                  example: 5000
+                description:
+                  type: string
+                  nullable: true
+                  example: Bottled mineral water 600ml
+                is_active:
+                  type: boolean
+                  default: true
+                  example: true
+      responses:
+        '201':
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Product'
+                  message:
+                    type: string
+                    example: Product successfully created.
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Forbidden (not admin)
+        '422':
+          description: Validation error
+
+  /products/{productId}:
+    get:
+      tags:
+        - Product
+      summary: Get product detail
+      description: Retrieve a single product that belongs to the authenticated admin's store.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: productId
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Product detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Product'
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Forbidden (product does not belong to your store)
+        '404':
+          description: Product not found
+
+    put:
+      tags:
+        - Product
+      summary: Update product
+      description: Update a product that belongs to the authenticated admin's store (partial update allowed).
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: productId
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - price
+              properties:
+                name:
+                  type: string
+                  example: Mineral Water 600ml Updated
+                sku:
+                  type: string
+                  nullable: true
+                  example: MIN-600-UPD
+                price:
+                  type: number
+                  format: float
+                  minimum: 0
+                  example: 5500
+                description:
+                  type: string
+                  nullable: true
+                is_active:
+                  type: boolean
+                  example: false
+      responses:
+        '200':
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Product'
+                  message:
+                    type: string
+                    example: Product successfully updated.
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Forbidden (product does not belong to your store)
+        '422':
+          description: Validation error
+
+    delete:
+      tags:
+        - Product
+      summary: Delete product
+      description: Delete a product that belongs to the authenticated admin's store.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: productId
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Product deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: Product successfully deleted.
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Forbidden (product does not belong to your store)
+        '404':
+          description: Product not found
