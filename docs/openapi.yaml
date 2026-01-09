@@ -1,0 +1,185 @@
+openapi: 3.0.3
+
+info:
+  title: Store Management API
+  description: Authentication API using JWT. Built with Laravel 11.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000/api
+    description: Local Development
+
+tags:
+  - name: Authentication
+    description: JWT authentication endpoints
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: superadmin@example.com
+        password:
+          type: string
+          format: password
+          example: password
+
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+        token_type:
+          type: string
+          example: Bearer
+        expires_in:
+          type: integer
+          example: 3600
+
+    LoginValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "The email field is required."
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 01keg02s5m0p2vx8baj8c4bsn6
+        store_id:
+          type: string
+          nullable: true
+          example: null
+        role_id:
+          type: string
+          example: 01keg02ry7eve4xkvxm9excd4c
+        first_name:
+          type: string
+          example: Super
+        last_name:
+          type: string
+          example: Admin
+        email:
+          type: string
+          format: email
+          example: superadmin@example.com
+        phone_number:
+          type: string
+          nullable: true
+          example: "+2916061428"
+        photo_profile:
+          type: string
+          nullable: true
+          example: null
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Successfully logged out
+
+paths:
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user and return JWT token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginValidationError'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+
+  /me:
+    get:
+      tags:
+        - Authentication
+      summary: Get authenticated user
+      description: Retrieve current authenticated user profile.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Authenticated user data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              example:
+                message: Unauthenticated
+
+  /logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout user
+      description: Invalidate current JWT token.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              example:
+                message: Unauthenticated
