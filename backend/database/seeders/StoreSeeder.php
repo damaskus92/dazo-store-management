@@ -29,7 +29,7 @@ class StoreSeeder extends Seeder
         // Toko Retail
         foreach ($branches as $branch) {
             Store::factory()
-                ->count(3)
+                ->count(2)
                 ->retail($branch)
                 ->create();
         }

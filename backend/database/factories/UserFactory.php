@@ -26,13 +26,13 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'store_id' => Store::factory(),
-            'role_id' => Role::factory(),
+            'store_id' => null,
+            'role_id' => null,
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'phone_number' => fake()->phoneNumber(),
+            'phone_number' => fake()->e164PhoneNumber(),
             'password' => static::$password ??= Hash::make('password'),
             'photo_profile' => null,
             'remember_token' => Str::random(10),
@@ -54,8 +54,31 @@ class UserFactory extends Factory
      */
     public function superAdmin(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn() => [
             'store_id' => null,
+            'role_id' => Role::where('name', 'super_admin')->first()->id,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is Admin
+     */
+    public function admin(Store $store): static
+    {
+        return $this->state(fn() => [
+            'store_id' => $store->id,
+            'role_id' => Role::where('name', 'admin')->first()->id,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is Cashier
+     */
+    public function cashier(Store $store): static
+    {
+        return $this->state(fn() => [
+            'store_id' => $store->id,
+            'role_id' => Role::where('name', 'cashier')->first()->id,
         ]);
     }
 }
