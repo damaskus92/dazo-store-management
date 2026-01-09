@@ -12,18 +12,6 @@ jobs:
   laravel-tests:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: laravel
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -32,7 +20,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: mbstring, pdo, pdo_mysql
+          extensions: mbstring, pdo, pdo_sqlite
           coverage: none
 
       - name: Cache Composer dependencies
@@ -44,8 +32,7 @@ jobs:
             ${{ runner.os }}-composer-
 
       - name: Copy .env
-        run: |
-          cp backend/.env.example backend/.env
+        run: cp backend/.env.example backend/.env
 
       - name: Install Composer dependencies
         working-directory: backend
@@ -63,23 +50,17 @@ jobs:
         working-directory: backend
         run: php artisan config:clear
 
-      - name: Wait for MySQL to be ready
+      - name: Prepare SQLite database
         run: |
-          until mysqladmin ping -h "127.0.0.1" -P 3306 --silent; do
-            echo "Waiting for MySQL..."
-            sleep 3
-          done
+          mkdir -p backend/database
+          touch backend/database/database.sqlite
 
-      - name: Run migrations (skip if cached)
+      - name: Run migrations
         working-directory: backend
         run: php artisan migrate --force
         env:
-          DB_CONNECTION: mysql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_DATABASE: laravel
-          DB_USERNAME: root
-          DB_PASSWORD: root
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
 
       - name: Run Pint (Lint PHP)
         working-directory: backend
@@ -89,9 +70,5 @@ jobs:
         working-directory: backend
         run: php artisan test
         env:
-          DB_CONNECTION: mysql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_DATABASE: laravel
-          DB_USERNAME: root
-          DB_PASSWORD: root
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
