@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CashierController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\SaleController;
 use App\Http\Controllers\Api\StoreController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
@@ -26,8 +27,16 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('/products/{product}', [ProductController::class, 'destroy']);
     });
 
+    Route::middleware('role:cashier')->group(function () {
+        Route::post('/sales', [SaleController::class, 'store']);
+        Route::post('/payments', [SaleController::class, 'pay']);
+    });
+
     Route::middleware('role:admin,cashier')->group(function () {
         Route::get('/products', [ProductController::class, 'index']);
         Route::get('/products/{product}', [ProductController::class, 'show']);
+
+        Route::get('/sales', [SaleController::class, 'index']);
+        Route::get('/sales/{sale}', [SaleController::class, 'show']);
     });
 });

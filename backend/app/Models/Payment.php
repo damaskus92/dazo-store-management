@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentMethod;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -29,6 +30,7 @@ class Payment extends Model
     protected function casts(): array
     {
         return [
+            'method' => PaymentMethod::class,
             'amount' => 'integer',
         ];
     }

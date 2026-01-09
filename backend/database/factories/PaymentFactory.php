@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Enums\PaymentMethod;
+use App\Models\Sale;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +19,9 @@ class PaymentFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'sale_id' => Sale::factory(),
+            'method' => PaymentMethod::CASH->value,
+            'amount' => fake()->randomFloat(2, 1000, 50000),
         ];
     }
 }
