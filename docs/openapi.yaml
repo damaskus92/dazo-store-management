@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: Store Management API
-  description: JWT authentication, Store, and User management API built with Laravel 11.
+  description: JWT authentication, Store, User, and Cashier management API built with Laravel 11.
   version: 1.0.0
 
 servers:
@@ -16,6 +16,8 @@ tags:
     description: Store management endpoints
   - name: User
     description: User management endpoints
+  - name: Cashier
+    description: Cashier management endpoints
 
 components:
   securitySchemes:
@@ -184,6 +186,27 @@ components:
         message:
           type: string
 
+    CashierListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            current_page:
+              type: integer
+            last_page:
+              type: integer
+            per_page:
+              type: integer
+            total:
+              type: integer
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
+
 paths:
   # Authentication endpoints
   /login:
@@ -244,7 +267,7 @@ paths:
         '401':
           description: Unauthenticated
 
-  # Store endpoints (already included)
+  # Store endpoints
   /stores:
     get:
       tags:
@@ -556,3 +579,222 @@ paths:
                 $ref: '#/components/schemas/MessageResponse'
         '403':
           description: Forbidden
+
+  # Cashier endpoints
+  /cashiers:
+    get:
+      tags:
+        - Cashier
+      summary: List cashiers in current admin's store
+      description: Paginated list of cashiers (role = cashier) in the authenticated admin's store, with optional search.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+            description: Search by first_name, last_name, or email
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: List of cashiers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashierListResponse'
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Forbidden (not admin or no store)
+
+    post:
+      tags:
+        - Cashier
+      summary: Create a new cashier
+      description: Create a cashier (role = cashier) in the authenticated admin's store.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - first_name
+                - last_name
+                - email
+                - password
+                - password_confirmation
+              properties:
+                first_name:
+                  type: string
+                  example: John
+                last_name:
+                  type: string
+                  example: Doe
+                email:
+                  type: string
+                  format: email
+                  example: cashier@example.com
+                phone_number:
+                  type: string
+                  nullable: true
+                  example: "08123456789"
+                password:
+                  type: string
+                  format: password
+                  minLength: 6
+                password_confirmation:
+                  type: string
+                  format: password
+      responses:
+        '201':
+          description: Cashier created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/User'
+                  message:
+                    type: string
+                    example: Cashier has been successfully created.
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Forbidden (not admin)
+        '422':
+          description: Validation error
+
+  /cashiers/{cashierId}:
+    get:
+      tags:
+        - Cashier
+      summary: Get cashier detail
+      description: Get detail of a cashier in the authenticated admin's store.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: cashierId
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Cashier detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Forbidden (not own store or not cashier)
+
+    put:
+      tags:
+        - Cashier
+      summary: Update cashier
+      description: Update a cashier in the authenticated admin's store (partial update allowed).
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: cashierId
+          schema:
+            type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                  example: Updated
+                last_name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phone_number:
+                  type: string
+                  nullable: true
+                password:
+                  type: string
+                  format: password
+                  minLength: 6
+                  nullable: true
+                password_confirmation:
+                  type: string
+                  format: password
+                  nullable: true
+      responses:
+        '200':
+          description: Cashier updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/User'
+                  message:
+                    type: string
+                    example: Cashier has been successfully updated.
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Forbidden (not own store or not cashier)
+        '422':
+          description: Validation error
+
+    delete:
+      tags:
+        - Cashier
+      summary: Delete cashier
+      description: Delete a cashier in the authenticated admin's store.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: cashierId
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Cashier deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: Cashier has been successfully deleted.
+        '401':
+          description: Unauthenticated
+        '403':
+          description: Forbidden (not own store or not cashier)
