@@ -23,7 +23,7 @@ class CashierController extends Controller
 
         $query = User::with('role', 'store')
             ->where('store_id', $request->user()->store_id)
-            ->whereHas('role', fn($q) => $q->where('name', 'cashier'));
+            ->whereHas('role', fn ($q) => $q->where('name', 'cashier'));
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -73,7 +73,7 @@ class CashierController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create cashier: ' . $e->getMessage(),
+                'message' => 'Failed to create cashier: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -135,7 +135,7 @@ class CashierController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to delete cashier: ' . $e->getMessage(),
+                'message' => 'Failed to delete cashier: '.$e->getMessage(),
             ], 500);
         }
     }

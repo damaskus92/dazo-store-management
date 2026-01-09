@@ -16,10 +16,15 @@ class CashierTest extends TestCase
     use RefreshDatabase;
 
     protected $admin;
+
     protected $otherAdmin;
+
     protected $adminToken;
+
     protected $otherAdminToken;
+
     protected $store;
+
     protected $otherStore;
 
     protected function setUp(): void
@@ -61,7 +66,7 @@ class CashierTest extends TestCase
             'role_id' => $cashierRole->id,
         ]);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->getJson('/api/cashiers');
 
         $response->assertStatus(200)
@@ -93,7 +98,7 @@ class CashierTest extends TestCase
             'phone_number' => '081234567890',
         ];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->postJson('/api/cashiers', $payload);
 
         $response->assertStatus(201)
@@ -121,8 +126,8 @@ class CashierTest extends TestCase
             'email' => 'alice@store.com',
         ]);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
-            ->getJson('/api/cashiers/' . $cashier->id);
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
+            ->getJson('/api/cashiers/'.$cashier->id);
 
         $response->assertStatus(200)
             ->assertJson([
@@ -164,8 +169,8 @@ class CashierTest extends TestCase
             'phone_number' => '089999999999',
         ];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
-            ->putJson('/api/cashiers/' . $cashier->id, $payload);
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
+            ->putJson('/api/cashiers/'.$cashier->id, $payload);
 
         $response->assertStatus(200)
             ->assertJson([
@@ -192,8 +197,8 @@ class CashierTest extends TestCase
             'role_id' => $cashierRole->id,
         ]);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
-            ->deleteJson('/api/cashiers/' . $cashier->id);
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
+            ->deleteJson('/api/cashiers/'.$cashier->id);
 
         $response->assertStatus(200)
             ->assertJson([
@@ -216,18 +221,18 @@ class CashierTest extends TestCase
         $payload = ['first_name' => 'Trying to hack'];
 
         // Show → 403
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
-            ->getJson('/api/cashiers/' . $otherCashier->id);
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
+            ->getJson('/api/cashiers/'.$otherCashier->id);
         $response->assertStatus(403);
 
         // Update → 403
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
-            ->putJson('/api/cashiers/' . $otherCashier->id, $payload);
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
+            ->putJson('/api/cashiers/'.$otherCashier->id, $payload);
         $response->assertStatus(403);
 
         // Delete → 403
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
-            ->deleteJson('/api/cashiers/' . $otherCashier->id);
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
+            ->deleteJson('/api/cashiers/'.$otherCashier->id);
         $response->assertStatus(403);
 
         // Pastikan data tidak berubah

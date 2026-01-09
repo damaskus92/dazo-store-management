@@ -17,12 +17,19 @@ class ProductTest extends TestCase
     use RefreshDatabase;
 
     protected $admin;
+
     protected $otherAdmin;
+
     protected $cashier;
+
     protected $adminToken;
+
     protected $otherAdminToken;
+
     protected $cashierToken;
+
     protected $store;
+
     protected $otherStore;
 
     protected function setUp(): void
@@ -64,13 +71,13 @@ class ProductTest extends TestCase
     {
         Product::factory()->count(3)->create(['store_id' => $this->store->id]);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->getJson('/api/products');
 
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'success',
-                'data' => ['data', 'current_page', 'last_page', 'per_page', 'total']
+                'data' => ['data', 'current_page', 'last_page', 'per_page', 'total'],
             ]);
     }
 
@@ -85,7 +92,7 @@ class ProductTest extends TestCase
             'is_active' => true,
         ];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->postJson('/api/products', $payload);
 
         $response->assertStatus(201)
@@ -105,8 +112,8 @@ class ProductTest extends TestCase
     {
         $product = Product::factory()->create(['store_id' => $this->store->id]);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
-            ->getJson('/api/products/' . $product->id);
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
+            ->getJson('/api/products/'.$product->id);
 
         $response->assertStatus(200)
             ->assertJsonStructure(['success', 'data' => ['id', 'name', 'sku', 'price', 'description', 'is_active']]);
@@ -123,8 +130,8 @@ class ProductTest extends TestCase
             'is_active' => false,
         ];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
-            ->putJson('/api/products/' . $product->id, $payload);
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
+            ->putJson('/api/products/'.$product->id, $payload);
 
         $response->assertStatus(200)
             ->assertJson(['success' => true, 'data' => ['name' => 'Updated Product', 'price' => 200]]);
@@ -137,8 +144,8 @@ class ProductTest extends TestCase
     {
         $product = Product::factory()->create(['store_id' => $this->store->id]);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
-            ->deleteJson('/api/products/' . $product->id);
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
+            ->deleteJson('/api/products/'.$product->id);
 
         $response->assertStatus(200)
             ->assertJson(['success' => true, 'message' => 'Product successfully deleted.']);
@@ -154,18 +161,18 @@ class ProductTest extends TestCase
         $payload = ['name' => 'Hacked Product', 'price' => 100];
 
         // Show
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
-            ->getJson('/api/products/' . $product->id);
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
+            ->getJson('/api/products/'.$product->id);
         $response->assertStatus(403);
 
         // Update
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
-            ->putJson('/api/products/' . $product->id, $payload);
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
+            ->putJson('/api/products/'.$product->id, $payload);
         $response->assertStatus(403);
 
         // Delete
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
-            ->deleteJson('/api/products/' . $product->id);
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
+            ->deleteJson('/api/products/'.$product->id);
         $response->assertStatus(403);
     }
 
@@ -175,24 +182,24 @@ class ProductTest extends TestCase
         $product = Product::factory()->create(['store_id' => $this->store->id]);
 
         // Show (allowed)
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->cashierToken)
-            ->getJson('/api/products/' . $product->id);
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->cashierToken)
+            ->getJson('/api/products/'.$product->id);
         $response->assertStatus(200);
 
         // Create (not allowed)
         $payload = ['name' => 'New Product', 'price' => 100];
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->cashierToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->cashierToken)
             ->postJson('/api/products', $payload);
         $response->assertStatus(403);
 
         // Update (not allowed)
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->cashierToken)
-            ->putJson('/api/products/' . $product->id, $payload);
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->cashierToken)
+            ->putJson('/api/products/'.$product->id, $payload);
         $response->assertStatus(403);
 
         // Delete (not allowed)
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->cashierToken)
-            ->deleteJson('/api/products/' . $product->id);
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->cashierToken)
+            ->deleteJson('/api/products/'.$product->id);
         $response->assertStatus(403);
     }
 }

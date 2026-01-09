@@ -24,15 +24,15 @@ class UpdateCashierRequest extends FormRequest
         $cashier = $this->route('cashier');
 
         return [
-            'first_name'   => ['sometimes', 'string', 'max:255'],
-            'last_name'    => ['sometimes', 'string', 'max:255'],
-            'email'        => [
+            'first_name' => ['sometimes', 'string', 'max:255'],
+            'last_name' => ['sometimes', 'string', 'max:255'],
+            'email' => [
                 'sometimes',
                 'email',
                 Rule::unique('users', 'email')->ignore($cashier?->id),
             ],
             'phone_number' => ['nullable', 'string', 'max:20'],
-            'password'     => ['nullable', 'string', 'min:6', 'confirmed'],
+            'password' => ['nullable', 'string', 'min:6', 'confirmed'],
         ];
     }
 
@@ -43,13 +43,13 @@ class UpdateCashierRequest extends FormRequest
     {
         return [
             'first_name.required' => 'First name is required.',
-            'last_name.required'  => 'Last name is required.',
-            'email.required'      => 'Email is required.',
-            'email.email'         => 'Email must be a valid email address.',
-            'email.unique'        => 'This email has already been taken.',
-            'phone_number.max'    => 'Phone number may not be greater than 20 characters.',
-            'password.min'        => 'Password must be at least 6 characters.',
-            'password.confirmed'  => 'Password confirmation does not match.',
+            'last_name.required' => 'Last name is required.',
+            'email.required' => 'Email is required.',
+            'email.email' => 'Email must be a valid email address.',
+            'email.unique' => 'This email has already been taken.',
+            'phone_number.max' => 'Phone number may not be greater than 20 characters.',
+            'password.min' => 'Password must be at least 6 characters.',
+            'password.confirmed' => 'Password confirmation does not match.',
         ];
     }
 }
