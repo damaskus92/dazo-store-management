@@ -12,6 +12,18 @@ jobs:
   laravel-tests:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: laravel
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,6 +34,14 @@ jobs:
           php-version: '8.3'
           extensions: mbstring, pdo, pdo_mysql
           coverage: none
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: backend/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
 
       - name: Copy .env
         run: |
@@ -35,12 +55,31 @@ jobs:
         working-directory: backend
         run: php artisan key:generate
 
-      - name: Run migrations
+      - name: Generate JWT secret
+        working-directory: backend
+        run: php artisan jwt:secret --force
+
+      - name: Clear config cache
+        working-directory: backend
+        run: php artisan config:clear
+
+      - name: Wait for MySQL to be ready
+        run: |
+          until mysqladmin ping -h "127.0.0.1" -P 3306 --silent; do
+            echo "Waiting for MySQL..."
+            sleep 3
+          done
+
+      - name: Run migrations (skip if cached)
         working-directory: backend
         run: php artisan migrate --force
         env:
-          DB_CONNECTION: sqlite
-          DB_DATABASE: database/database.sqlite
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: laravel
+          DB_USERNAME: root
+          DB_PASSWORD: root
 
       - name: Run Pint (Lint PHP)
         working-directory: backend
@@ -49,3 +88,10 @@ jobs:
       - name: Run tests
         working-directory: backend
         run: php artisan test
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: laravel
+          DB_USERNAME: root
+          DB_PASSWORD: root
