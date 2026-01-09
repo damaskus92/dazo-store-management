@@ -12,19 +12,19 @@ class Payment extends Model
     use HasFactory, HasUlids;
 
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     protected $fillable = [
         'sale_id',
         'method',
-        'amount'
+        'amount',
     ];
 
     protected $hidden = [];
 
     /**
      * Get the attributes that should be cast.
-     *
      */
     protected function casts(): array
     {

@@ -24,10 +24,10 @@ class UpdateStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'      => ['sometimes', 'required', 'string', 'max:255'],
-            'level'     => ['sometimes', 'required', Rule::enum(StoreLevel::class)],
-            'address'   => ['nullable', 'string'],
-            'phone'     => ['nullable', 'string', 'max:20'],
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'level' => ['sometimes', 'required', Rule::enum(StoreLevel::class)],
+            'address' => ['nullable', 'string'],
+            'phone' => ['nullable', 'string', 'max:20'],
             'parent_id' => ['nullable', 'exists:stores,id'],
         ];
     }
@@ -35,9 +35,9 @@ class UpdateStoreRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required'    => 'Store name is required when provided.',
-            'level.required'   => 'Store level is required when provided.',
-            'level.in'         => 'Store level must be one of: center, branch, retail.',
+            'name.required' => 'Store name is required when provided.',
+            'level.required' => 'Store level is required when provided.',
+            'level.in' => 'Store level must be one of: center, branch, retail.',
             'parent_id.exists' => 'Parent store not found.',
         ];
     }

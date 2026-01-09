@@ -29,7 +29,7 @@ class StoreFactory extends Factory
 
     public function center(): static
     {
-        return $this->state(fn() => [
+        return $this->state(fn () => [
             'level' => StoreLevel::CENTER,
             'parent_id' => null,
         ]);
@@ -37,7 +37,7 @@ class StoreFactory extends Factory
 
     public function branch(Store $parent): static
     {
-        return $this->state(fn() => [
+        return $this->state(fn () => [
             'level' => StoreLevel::BRANCH,
             'parent_id' => $parent->id,
         ]);
@@ -45,7 +45,7 @@ class StoreFactory extends Factory
 
     public function retail(Store $parent): static
     {
-        return $this->state(fn() => [
+        return $this->state(fn () => [
             'level' => StoreLevel::RETAIL,
             'parent_id' => $parent->id,
         ]);

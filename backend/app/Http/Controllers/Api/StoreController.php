@@ -35,7 +35,7 @@ class StoreController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $stores
+            'data' => $stores,
         ]);
     }
 
@@ -57,7 +57,7 @@ class StoreController extends Controller
                 'role_id' => $adminRole->id,
                 'first_name' => 'Admin',
                 'last_name' => $store->name,
-                'email' => strtolower('admin@' . Str::slug($store->name) . '.com'),
+                'email' => strtolower('admin@'.Str::slug($store->name).'.com'),
                 'phone_number' => null,
                 'password' => Hash::make('password123'),
             ]);
@@ -67,7 +67,7 @@ class StoreController extends Controller
                 'role_id' => $cashierRole->id,
                 'first_name' => 'Cashier',
                 'last_name' => $store->name,
-                'email' => strtolower('cashier@' . Str::slug($store->name) . '.com'),
+                'email' => strtolower('cashier@'.Str::slug($store->name).'.com'),
                 'phone_number' => null,
                 'password' => Hash::make('password123'),
             ]);
@@ -77,13 +77,14 @@ class StoreController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $store,
-                'message' => 'Store has been successfully created.'
+                'message' => 'Store has been successfully created.',
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create store: ' . $e->getMessage()
+                'message' => 'Failed to create store: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -97,7 +98,7 @@ class StoreController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $store
+            'data' => $store,
         ]);
     }
 
@@ -110,7 +111,7 @@ class StoreController extends Controller
         if ($request->parent_id && $request->parent_id === $store->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Parent store cannot be itself.'
+                'message' => 'Parent store cannot be itself.',
             ], 422);
         }
 
@@ -119,7 +120,7 @@ class StoreController extends Controller
         return response()->json([
             'success' => true,
             'data' => $store,
-            'message' => 'Store has been successfully updated.'
+            'message' => 'Store has been successfully updated.',
         ]);
     }
 
@@ -133,12 +134,12 @@ class StoreController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Store has been successfully deleted.'
+                'message' => 'Store has been successfully deleted.',
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to delete store: ' . $e->getMessage()
+                'message' => 'Failed to delete store: '.$e->getMessage(),
             ], 500);
         }
     }

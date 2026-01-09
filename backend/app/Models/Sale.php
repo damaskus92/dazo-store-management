@@ -13,6 +13,7 @@ class Sale extends Model
     use HasFactory, HasUlids;
 
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     protected $fillable = [
@@ -24,12 +25,10 @@ class Sale extends Model
         'change_amount',
     ];
 
-
     protected $hidden = [];
 
     /**
      * Get the attributes that should be cast.
-     *
      */
     protected function casts(): array
     {
@@ -42,7 +41,6 @@ class Sale extends Model
 
     /**
      * Defines relationships between models..
-     *
      */
     public function items(): HasMany
     {

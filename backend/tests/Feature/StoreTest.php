@@ -16,11 +16,15 @@ class StoreTest extends TestCase
     use RefreshDatabase;
 
     protected $superAdmin;
+
     protected $admin;
+
     protected $cashier;
 
     protected $jwtToken;
+
     protected $adminToken;
+
     protected $cashierToken;
 
     protected function setUp(): void
@@ -34,21 +38,21 @@ class StoreTest extends TestCase
         // Super Admin
         $this->superAdmin = User::factory()->create([
             'role_id' => $superAdminRole->id,
-            'password' => Hash::make('password123')
+            'password' => Hash::make('password123'),
         ]);
         $this->jwtToken = JWTAuth::fromUser($this->superAdmin);
 
         // Admin
         $this->admin = User::factory()->create([
             'role_id' => $adminRole->id,
-            'password' => Hash::make('password123')
+            'password' => Hash::make('password123'),
         ]);
         $this->adminToken = JWTAuth::fromUser($this->admin);
 
         // Cashier
         $this->cashier = User::factory()->create([
             'role_id' => $cashierRole->id,
-            'password' => Hash::make('password123')
+            'password' => Hash::make('password123'),
         ]);
         $this->cashierToken = JWTAuth::fromUser($this->cashier);
     }
@@ -60,27 +64,27 @@ class StoreTest extends TestCase
         Store::factory()->create(['name' => 'Branch Store', 'level' => 'branch']);
         Store::factory()->create(['name' => 'Retail Store', 'level' => 'retail']);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->jwtToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->jwtToken)
             ->getJson('/api/stores');
 
         $response->assertStatus(200)
             ->assertJsonStructure(['success', 'data' => ['data', 'current_page', 'last_page', 'total']]);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->jwtToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->jwtToken)
             ->getJson('/api/stores?search=Central');
 
         $response->assertStatus(200)
             ->assertJsonFragment(['name' => 'Central Store'])
             ->assertJsonCount(1, 'data.data');
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->jwtToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->jwtToken)
             ->getJson('/api/stores?search=branch');
 
         $response->assertStatus(200)
             ->assertJsonFragment(['level' => 'branch'])
             ->assertJsonCount(1, 'data.data');
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->jwtToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->jwtToken)
             ->getJson('/api/stores?per_page=2');
 
         $response->assertStatus(200)
@@ -95,10 +99,10 @@ class StoreTest extends TestCase
             'level' => 'center',
             'address' => '123 Main St',
             'phone' => '08123456789',
-            'parent_id' => null
+            'parent_id' => null,
         ];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->jwtToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->jwtToken)
             ->postJson('/api/stores', $payload);
 
         $response->assertStatus(201)
@@ -106,8 +110,8 @@ class StoreTest extends TestCase
                 'success' => true,
                 'data' => [
                     'name' => 'Central Store',
-                    'level' => 'center'
-                ]
+                    'level' => 'center',
+                ],
             ]);
 
         $storeId = $response->json('data.id');
@@ -121,7 +125,7 @@ class StoreTest extends TestCase
     {
         $store = Store::factory()->create();
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->jwtToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->jwtToken)
             ->getJson("/api/stores/{$store->id}");
 
         $response->assertStatus(200)
@@ -135,7 +139,7 @@ class StoreTest extends TestCase
 
         $payload = ['name' => 'Updated Store', 'level' => 'branch'];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->jwtToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->jwtToken)
             ->putJson("/api/stores/{$store->id}", $payload);
 
         $response->assertStatus(200)
@@ -151,7 +155,7 @@ class StoreTest extends TestCase
 
         $payload = ['parent_id' => $store->id];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->jwtToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->jwtToken)
             ->putJson("/api/stores/{$store->id}", $payload);
 
         $response->assertStatus(422)
@@ -163,7 +167,7 @@ class StoreTest extends TestCase
     {
         $store = Store::factory()->create();
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->jwtToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->jwtToken)
             ->deleteJson("/api/stores/{$store->id}");
 
         $response->assertStatus(200)
@@ -177,7 +181,7 @@ class StoreTest extends TestCase
     {
         $payload = ['name' => 'Store', 'level' => 'center'];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->postJson('/api/stores', $payload);
 
         $response->assertStatus(403)
@@ -189,7 +193,7 @@ class StoreTest extends TestCase
     {
         $payload = ['name' => 'Store', 'level' => 'center'];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->cashierToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->cashierToken)
             ->postJson('/api/stores', $payload);
 
         $response->assertStatus(403)
@@ -203,7 +207,7 @@ class StoreTest extends TestCase
 
         $payload = ['name' => 'Attempt Update'];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->putJson("/api/stores/{$store->id}", $payload);
 
         $response->assertStatus(403)
@@ -215,7 +219,7 @@ class StoreTest extends TestCase
     {
         $store = Store::factory()->create();
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->cashierToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->cashierToken)
             ->deleteJson("/api/stores/{$store->id}");
 
         $response->assertStatus(403)

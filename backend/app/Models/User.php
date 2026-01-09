@@ -15,7 +15,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasUlids, HasRoles;
+    use HasFactory, HasRoles, HasUlids, Notifiable;
 
     protected $fillable = [
         'store_id',
@@ -30,7 +30,6 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * The attributes that should be hidden for serialization.
-     *
      */
     protected $hidden = [
         'password',
@@ -39,7 +38,6 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * Get the attributes that should be cast.
-     *
      */
     protected function casts(): array
     {
@@ -51,7 +49,6 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
-     *
      */
     public function getJWTIdentifier()
     {
@@ -60,7 +57,6 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * Return a key value array, containing any custom claims to be added to the JWT.
-     *
      */
     public function getJWTCustomClaims()
     {
@@ -69,7 +65,6 @@ class User extends Authenticatable implements JWTSubject
 
     /**
      * Defines relationships between models..
-     *
      */
     public function role(): BelongsTo
     {

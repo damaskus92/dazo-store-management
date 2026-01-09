@@ -44,7 +44,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
     }
@@ -54,7 +54,7 @@ class UserFactory extends Factory
      */
     public function superAdmin(): static
     {
-        return $this->state(fn() => [
+        return $this->state(fn () => [
             'store_id' => null,
             'role_id' => Role::where('name', 'super_admin')->first()->id,
         ]);
@@ -65,7 +65,7 @@ class UserFactory extends Factory
      */
     public function admin(Store $store): static
     {
-        return $this->state(fn() => [
+        return $this->state(fn () => [
             'store_id' => $store->id,
             'role_id' => Role::where('name', 'admin')->first()->id,
         ]);
@@ -76,7 +76,7 @@ class UserFactory extends Factory
      */
     public function cashier(Store $store): static
     {
-        return $this->state(fn() => [
+        return $this->state(fn () => [
             'store_id' => $store->id,
             'role_id' => Role::where('name', 'cashier')->first()->id,
         ]);

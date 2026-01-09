@@ -13,6 +13,7 @@ class Product extends Model
     use HasFactory, HasUlids;
 
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     protected $fillable = [
@@ -28,7 +29,6 @@ class Product extends Model
 
     /**
      * Get the attributes that should be cast.
-     *
      */
     protected function casts(): array
     {
@@ -40,7 +40,6 @@ class Product extends Model
 
     /**
      * Defines relationships between models..
-     *
      */
     public function store(): BelongsTo
     {

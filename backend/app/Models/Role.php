@@ -13,13 +13,13 @@ class Role extends Model
     use HasFactory, HasUlids;
 
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     protected $fillable = ['name'];
 
     /**
      * Get the attributes that should be cast.
-     *
      */
     protected function casts(): array
     {
@@ -28,7 +28,6 @@ class Role extends Model
 
     /**
      * Defines relationships between models..
-     *
      */
     public function users(): HasMany
     {

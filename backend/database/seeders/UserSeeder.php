@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Store;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -33,14 +32,14 @@ class UserSeeder extends Seeder
                 ->unverified()
                 ->admin($store)
                 ->create([
-                    'email' => 'admin_' . Str::lower(Str::random(5)) . '@example.com',
+                    'email' => 'admin_'.Str::lower(Str::random(5)).'@example.com',
                 ]);
 
             User::factory()
                 ->unverified()
                 ->cashier($store)
                 ->create([
-                    'email' => 'cashier_' . Str::lower(Str::random(5)) . '@example.com',
+                    'email' => 'cashier_'.Str::lower(Str::random(5)).'@example.com',
                 ]);
         }
     }
